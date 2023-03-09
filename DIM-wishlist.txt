@@ -1,9 +1,11 @@
-// EXOTICS =====================================================================
+title: Lord Trivial's shitty list
+description: Just a list of things
 
-// WITHERHOARD
+// EXOTICS =====================================================================
 dimwishlist:item=2357297366&perks=
 
 // SHOTTY ======================================================================
+// HAND IN HAND
 
-// HAND IN HAND: SLIDE SHOT, ONE-TWO PUNCH
+//notes:Trivial: SLIDE SHOT, ONE-TWO PUNCH
 dimwishlist:item=664109750&perks=,,3161816588,2679249093

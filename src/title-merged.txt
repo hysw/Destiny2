@@ -1,2 +1,5 @@
 title: Trivial's merged wishlist
 description: List merged from trivial list and choosy_voltron
+
+// https://raw.githubusercontent.com/hysw/Destiny2/main/generated/wishlist.txt
+// https://raw.githubusercontent.com/hysw/Destiny2/main/generated/with_choosy_voltron.txt

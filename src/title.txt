@@ -1,3 +1,2 @@
-title: Trivial's merged wishlist
-description: Stuff
-
+title:Lord Trivial's shitty list
+description:Just a list of things

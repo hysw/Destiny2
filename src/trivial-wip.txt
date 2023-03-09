@@ -2,14 +2,16 @@ title:Lord Trivial's shitty list
 description:Just a list of things
 
 // EXOTICS =====================================================================
+// WITHERHOARD
 dimwishlist:item=2357297366&perks=
 
 // SHOTTY ======================================================================
 
 // XENOCLAST IV
-//note:Trivial: ONE-TWO PUNCH
+//notes:Trivial: ONE-TWO PUNCH rolls
 dimwishlist:item=2891672170&perks=,,2039302152,2679249093
 dimwishlist:item=2891672170&perks=,,3300816228,2679249093
+dimwishlist:item=2891672170&perks=,,3161816588,2679249093
 
 // HAND IN HAND
 //notes:Trivial: SLIDE SHOT, ONE-TWO PUNCH

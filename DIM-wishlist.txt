@@ -1,5 +1,5 @@
-title: Lord Trivial's shitty list
-description: Just a list of things
+title:Lord Trivial's shitty list
+description:Just a list of things
 
 // EXOTICS =====================================================================
 dimwishlist:item=2357297366&perks=

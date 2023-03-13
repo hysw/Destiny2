@@ -1,4 +1,6 @@
 // SEVENTH SERAPH OFFICER REVOLVER
-dimwishlist:item=-1555959830#notes:Trivial: trash 180...
+dimwishlist:item=-1555959830#notes:Trivial: trash weapon
 
+// SEVENTH SERAPH CARBINE
+dimwishlist:item=-4070357005#notes:Trivial: trash weapon
 

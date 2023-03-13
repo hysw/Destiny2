@@ -1,36 +1,6 @@
 // EXOTICS =====================================================================
 dimwishlist:item=2357297366&perks=#notes:WITHERHOARD
 
-// Terminal Overload Weapons ===================================================
-
-// SYNCHRONIC ROULETTE
-
-//notes:Trivial: HATCHLING
-dimwishlist:item=811403305&perks=,,3619207468,831391274
-dimwishlist:item=811403305&perks=,,1645158859,831391274
-dimwishlist:item=811403305&perks=,,968510818,831391274
-
-dimwishlist:item=-811403305&perks=,,,3511092054#notes: ELEMENTAL CAPACITOR
-dimwishlist:item=-811403305&perks=,,,3751912585#notes: CASCADE POINT
-dimwishlist:item=-811403305&perks=,,,365154968#notes: TARGET LOCK
-
-// BASSO OSTINATO
-
-//notes:Trivial
-//dimwishlist:item=2573900604&perks=,,,2048641572#notes: DESTABILIZING ROUNDS
-//dimwishlist:item=2573900604&perks=,,,2679249093#notes: ONE-TWO PUNCH
-
-dimwishlist:item=-2573900604&perks=,,,3673922083#notes: ADAGIO
-dimwishlist:item=-2573900604&perks=,,,47981717#notes: OPENING SHOT
-
-// CIRCULAR LOGIC
-
-//notes:Trivial
-dimwishlist:item=2187717691&perks=,,968510818,831391274
-dimwishlist:item=2187717691&perks=,,3619207468,831391274
-dimwishlist:item=2187717691&perks=,,2779035018,831391274
-
-
 // SHOTTY ======================================================================
 
 // XENOCLAST IV

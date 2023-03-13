@@ -2,6 +2,9 @@ type LICENSE > generated\wishlist.LICENSE
 type ^
   src\title.txt src\section-line.txt ^
   src\trivial-wip.txt src\section-line.txt ^
+  src\trivial\Neomuna.txt src\section-line.txt ^
+  src\trivial\RAID-RON.txt src\section-line.txt ^
+  src\trivial\S20.txt src\section-line.txt ^
   src\trivial-trash.txt src\section-line.txt ^
   > generated\wishlist.txt
   

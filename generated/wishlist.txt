@@ -7,6 +7,28 @@ description:Just a list of things
 // EXOTICS =====================================================================
 dimwishlist:item=2357297366&perks=#notes:WITHERHOARD
 
+// SHOTTY ======================================================================
+
+// XENOCLAST IV
+//notes:Trivial: ONE-TWO PUNCH rolls
+dimwishlist:item=2891672170&perks=,,2039302152,2679249093
+dimwishlist:item=2891672170&perks=,,3300816228,2679249093
+dimwishlist:item=2891672170&perks=,,3161816588,2679249093
+
+// HAND IN HAND
+//notes:Trivial: SLIDE SHOT, ONE-TWO PUNCH
+dimwishlist:item=664109750&perks=,,3161816588,2679249093
+
+
+// SWORD =======================================================================
+// ZEPHYR
+//notes:Trivial: COLD STEEL
+dimwishlist:item=396910433&perks=,,2590710093,3650930298
+dimwishlist:item=396910433&perks=,,1749209109,3650930298
+dimwishlist:item=396910433&perks=,,3108830275,3650930298
+
+
+//==============================================================================
 // Terminal Overload Weapons ===================================================
 
 // SYNCHRONIC ROULETTE
@@ -35,33 +57,19 @@ dimwishlist:item=-2573900604&perks=,,,47981717#notes: OPENING SHOT
 dimwishlist:item=2187717691&perks=,,968510818,831391274
 dimwishlist:item=2187717691&perks=,,3619207468,831391274
 dimwishlist:item=2187717691&perks=,,2779035018,831391274
+dimwishlist:item=2187717691&perks=,,968510818,365154968
+//==============================================================================
+// Root of Nightmares
+//==============================================================================
+// Season of Defiance (Season 20)
 
-
-// SHOTTY ======================================================================
-
-// XENOCLAST IV
-//notes:Trivial: ONE-TWO PUNCH rolls
-dimwishlist:item=2891672170&perks=,,2039302152,2679249093
-dimwishlist:item=2891672170&perks=,,3300816228,2679249093
-dimwishlist:item=2891672170&perks=,,3161816588,2679249093
-
-// HAND IN HAND
-//notes:Trivial: SLIDE SHOT, ONE-TWO PUNCH
-dimwishlist:item=664109750&perks=,,3161816588,2679249093
-
-
-// SWORD =======================================================================
-// ZEPHYR
-//notes:Trivial: COLD STEEL
-dimwishlist:item=396910433&perks=,,2590710093,3650930298
-dimwishlist:item=396910433&perks=,,1749209109,3650930298
-dimwishlist:item=396910433&perks=,,3108830275,3650930298
-
-
+dimwishlist:item=2187717691&perks=202670084,1885400500,968510818,365154968
 //==============================================================================
 // SEVENTH SERAPH OFFICER REVOLVER
-dimwishlist:item=-1555959830#notes:Trivial: trash 180...
+dimwishlist:item=-1555959830#notes:Trivial: trash weapon
 
+// SEVENTH SERAPH CARBINE
+dimwishlist:item=-4070357005#notes:Trivial: trash weapon
 
 
 //==============================================================================

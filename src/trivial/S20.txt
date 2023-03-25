@@ -1,1 +1,6 @@
 // Season of Defiance (Season 20)
+
+// Harsh Language (void waveframe GL)
+//notes:Trivial
+dimwishlist:item=1606497639&perks=,,,2048641572
+dimwishlist:item=1606497639&perks=,,968510818,3108830275

@@ -60,10 +60,18 @@ dimwishlist:item=2187717691&perks=,,2779035018,831391274
 dimwishlist:item=2187717691&perks=,,968510818,365154968
 //==============================================================================
 // Root of Nightmares
+
+// Rufus's Fury (strand auto)
+dimwishlist:item=484515708&perks=,,1523832109,831391274
+dimwishlist:item=484515708&perks=,,3523296417,831391274
+dimwishlist:item=484515708&perks=,,3418782618,831391274
 //==============================================================================
 // Season of Defiance (Season 20)
 
-dimwishlist:item=2187717691&perks=202670084,1885400500,968510818,365154968
+// Harsh Language (void waveframe GL)
+//notes:Trivial
+dimwishlist:item=1606497639&perks=,,,2048641572
+dimwishlist:item=1606497639&perks=,,968510818,3108830275
 //==============================================================================
 // SEVENTH SERAPH OFFICER REVOLVER
 dimwishlist:item=-1555959830#notes:Trivial: trash weapon

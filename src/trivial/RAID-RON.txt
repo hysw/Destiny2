@@ -1,2 +1,14 @@
 // Root of Nightmares
 
+// Rufus's Fury (strand auto)
+dimwishlist:item=484515708&perks=,,1523832109,831391274
+dimwishlist:item=484515708&perks=,,3523296417,831391274
+dimwishlist:item=484515708&perks=,,3418782618,831391274
+
+// Mykel's Reverence (strand sidearm)
+dimwishlist:item=231031173&perks=,,3418782618,831391274
+
+// Nessa's Oblation
+dimwishlist:item=135029084&perks=,,1523832109,2896038713
+
+// koraxis's distress

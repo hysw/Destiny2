@@ -10,8 +10,6 @@ def filter_lines(lines):
   keep_lines = True
   output = []
   for line in lines:
-      if line.startswith("title:"):
-        line = "// "+ line
       if not line.startswith("dimwishlist:"):
         keep_lines = True
         current_note = ""
@@ -28,7 +26,7 @@ with open(sys.argv[1], encoding="utf-8") as listfile:
   lines = [line.strip("\n") for line in listfile]
 lines = filter_lines(lines)
 with open(sys.argv[2], encoding="utf-8", mode="w") as listfile:
-  listfile.write("title: Trivial's subset of voltron")
+  listfile.write("title: Trivial's subset of voltron\n")
   for line in lines:
     listfile.write(line)
     listfile.write("\n")

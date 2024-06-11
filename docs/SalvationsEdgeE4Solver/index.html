@@ -8,10 +8,10 @@
     const DISSECT_R = 0b000001;
     const DISSECT_N = 0b000000;
     const DISSECT_NAME = {
-      0b010000:"L",
-      0b000100:"M",
-      0b000001:"R",
-      0b000001:"N",
+      0b010000: "L",
+      0b000100: "M",
+      0b000001: "R",
+      0b000001: "N",
     };
 
     function makeDissectOps() {
@@ -64,6 +64,7 @@
       uiState.inner[side] = name;
       uiState.inner[oside] = oname;
 
+      uiState.outer = { L: null, M: null, R: null };
       $("#so_L").html(svgShapes.NN);
       $("#so_M").html(svgShapes.NN);
       $("#so_R").html(svgShapes.NN);
@@ -110,7 +111,7 @@
         return;
       }
       var stack = [];
-      while(resolved != null) {
+      while (resolved != null) {
         stack.push(stateToShapes(resolved.state));
         if (resolved.op != null) {
           stack.push(opToShapes(resolved.op));

@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<svg fill="#000000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+   viewBox="0 0 1 1" xml:space="preserve">
+    <path d="M0.1,0.2 A0.4,0.1,0,0,0,0.9,0.2 A0.4,0.1,0,0,0,0.1,0.2
+             L0.1,0.8 A0.4,0.1,0,0,0,0.9,0.8
+             L0.9,0.2" fill="none" stroke="black" stroke-width="0.05" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M0.9,0.8 A0.4,0.1,0,0,0,0.1,0.8" fill="none" stroke="black" stroke-width="0.05" stroke-dasharray="0.05,0.05"/>
+</svg>

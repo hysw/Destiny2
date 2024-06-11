@@ -1,0 +1,272 @@
+<html>
+
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script>
+    const DISSECT_L = 0b010000;
+    const DISSECT_M = 0b000100;
+    const DISSECT_R = 0b000001;
+    const DISSECT_N = 0b000000;
+    const DISSECT_NAME = {
+      0b010000:"L",
+      0b000100:"M",
+      0b000001:"R",
+      0b000001:"N",
+    };
+
+    function makeDissectOps() {
+      var ops = [];
+      var pairs = [
+        [DISSECT_L, DISSECT_M],
+        [DISSECT_L, DISSECT_R],
+        [DISSECT_M, DISSECT_R],
+      ];
+      for (let i = 0; i < pairs.length; i++) {
+        let a = pairs[i][0];
+        let b = pairs[i][1];
+        let c = DISSECT_N;
+        ops.push(new Uint8Array([a, b, c]));
+        ops.push(new Uint8Array([a, c, b]));
+        ops.push(new Uint8Array([b, a, c]));
+        ops.push(new Uint8Array([b, c, a]));
+        ops.push(new Uint8Array([c, a, b]));
+        ops.push(new Uint8Array([c, b, a]));
+      }
+      return ops;
+    };
+    const DISSECT_OPS = makeDissectOps();
+
+    var svgShapes = {
+      N: '<img src="assets/null.svg" class="glyphInnerSelected">',
+      T: '<img src="assets/triangle.svg" class="glyphInnerSelected">',
+      C: '<img src="assets/circle.svg" class="glyphInnerSelected">',
+      S: '<img src="assets/square.svg" class="glyphInnerSelected">',
+      NN: '<img src="assets/null.svg" class="glyphOuterSelected">',
+      TT: '<img src="assets/tetrahedron.svg" class="glyphOuterSelected">',
+      CC: '<img src="assets/sphere.svg" class="glyphOuterSelected">',
+      SS: '<img src="assets/cube.svg" class="glyphOuterSelected">',
+      TC: '<img src="assets/cone.svg" class="glyphOuterSelected">',
+      CT: '<img src="assets/cone.svg" class="glyphOuterSelected">',
+      CS: '<img src="assets/cylinder.svg" class="glyphOuterSelected">',
+      SC: '<img src="assets/cylinder.svg" class="glyphOuterSelected">',
+      TS: '<img src="assets/prism.svg" class="glyphOuterSelected">',
+      ST: '<img src="assets/prism.svg" class="glyphOuterSelected">',
+    }
+    var uiState = {
+      inner: { L: "T", M: "C", R: "S" },
+      outer: { L: null, M: null, R: null },
+    };
+    function selectInner(side, name) {
+      var oname = uiState.inner[side];
+      var oside = (uiState.inner.L == name ? "L" : (uiState.inner.M == name ? "M" : "R"));
+      $("#si_" + oside).html(svgShapes[oname]);
+      $("#si_" + side).html(svgShapes[name]);
+      uiState.inner[side] = name;
+      uiState.inner[oside] = oname;
+
+      $("#so_L").html(svgShapes.NN);
+      $("#so_M").html(svgShapes.NN);
+      $("#so_R").html(svgShapes.NN);
+    }
+    function toAbstractShape(shapeStr) {
+      if (shapeStr == null || shapeStr.length != 2) {
+        return 0;
+      }
+      var shapes = shapeStr.split('');
+      var lookup = {};
+      lookup[uiState.inner.L] = DISSECT_L;
+      lookup[uiState.inner.M] = DISSECT_M;
+      lookup[uiState.inner.R] = DISSECT_R;
+      return lookup[shapes[0]] + lookup[shapes[1]];
+    }
+    function stateToShapes(state) {
+      var lShape = svgShapes[shape3dToStringSubs(state[0], uiState.inner.L, uiState.inner.M, uiState.inner.R)];
+      var mShape = svgShapes[shape3dToStringSubs(state[1], uiState.inner.L, uiState.inner.M, uiState.inner.R)];
+      var rShape = svgShapes[shape3dToStringSubs(state[2], uiState.inner.L, uiState.inner.M, uiState.inner.R)];
+      return lShape + mShape + rShape;
+    }
+    function opToShapes(op) {
+      var lookup = {};
+      lookup[DISSECT_L] = svgShapes[uiState.inner.L];
+      lookup[DISSECT_M] = svgShapes[uiState.inner.M];
+      lookup[DISSECT_R] = svgShapes[uiState.inner.R];
+      lookup[DISSECT_N] = svgShapes.N;
+      return lookup[op[0]] + lookup[op[1]] + lookup[op[2]];
+    }
+    function updateState() {
+      var finalState = new Uint8Array([
+        DISSECT_M | DISSECT_R,
+        DISSECT_L | DISSECT_R,
+        DISSECT_L | DISSECT_M,
+      ]);
+      var startState = new Uint8Array([
+        toAbstractShape(uiState.outer.L),
+        toAbstractShape(uiState.outer.M),
+        toAbstractShape(uiState.outer.R),
+      ]);
+      var resolved = bfsSolve(startState, finalState, DISSECT_OPS);
+      if (resolved == null) {
+        $("#solution_output").html("<div></div>");
+        return;
+      }
+      var stack = [];
+      while(resolved != null) {
+        stack.push(stateToShapes(resolved.state));
+        if (resolved.op != null) {
+          stack.push(opToShapes(resolved.op));
+        }
+        resolved = resolved.prev;
+      }
+      stack.reverse();
+      $("#solution_output").html(stack.join("<br>"));
+    }
+    function selectOuter(side, name) {
+      $("#so_" + side).html(svgShapes[name]);
+      uiState.outer[side] = name;
+      updateState();
+    }
+    function shape3dToStringSubs(shape, L, M, R) {
+      return L.repeat((shape >> 4) & 3) + M.repeat((shape >> 2) & 3) + R.repeat(shape & 3)
+    }
+    function shape3dToString(shape) {
+      return "L".repeat((shape >> 4) & 3) + "M".repeat((shape >> 2) & 3) + "R".repeat(shape & 3)
+    }
+    function stateToString(state) {
+      return shape3dToString(state[0]) + " " + shape3dToString(state[1]) + " " + shape3dToString(state[2]);
+    }
+    function makeShape12bit(shape6) {
+      return (((shape6 >> 4) & 3) << 8) | (((shape6 >> 2) & 3) << 4) | (shape6 & 3);
+    }
+    function makeShape6bit(shape12) {
+      return (((shape12 >> 8) & 3) << 4) | (((shape12 >> 4) & 3) << 2) | (shape12 & 3);
+    }
+    function dissect(shape, dec, inc) {
+      if ((shape & (dec * 3)) > 0) {
+        return shape - dec + inc;
+      }
+      return 0;
+    }
+    function applyOp(state, op) {
+      var elems = new Uint16Array(3);
+      elems[0] = (op[0] > 0 ? dissect(state[0], op[0], op[1] | op[2]) : state[0]);
+      elems[1] = (op[1] > 0 ? dissect(state[1], op[1], op[0] | op[2]) : state[1]);
+      elems[2] = (op[2] > 0 ? dissect(state[2], op[2], op[0] | op[1]) : state[2]);
+      if (elems[0] == 0 || elems[1] == 0 || elems[2] == 0) {
+        return null;
+      }
+      return elems;
+    }
+
+    function stateToId(state) {
+      return (state != null ? ((state[2] << 12) | (state[1] << 6) | state[0]) : 0);
+    }
+    function stateEq(a, b) { return stateToId(a) == stateToId(b); }
+
+    function bfsSolve(state, finalState, ops) {
+      var queue = [{ state: state, prev: null }];
+      var known = new Set();
+      known.add(stateToId(state));
+      for (let i = 0; i < queue.length && i < (1 << 18); i++) {
+        let curr = queue[i];
+        if (stateEq(curr.state, finalState)) {
+          return curr;
+        }
+        for (let j = 0; j < ops.length; j++) {
+          let res = applyOp(curr.state, ops[j]);
+          let sid = stateToId(res);
+          if (res != null && !known.has(sid)) {
+            queue.push({ state: res, prev: curr, op: ops[j] });
+            known.add(sid);
+          }
+        }
+      }
+      return null;
+    }
+  </script>
+  <style>
+    .glyphInnerSelect {
+      width: 2em;
+    }
+
+    .glyphOuterSelect {
+      width: 2em;
+    }
+
+    .glyphInnerSelected {
+      width: 6em;
+    }
+
+    .glyphOuterSelected {
+      width: 6em;
+    }
+  </style>
+</head>
+
+<body>
+  <div>Work in Progress:<br>Destiny 2: Salvation's Edge E4 Solver</div>
+  <table>
+    <tr id="selected">
+      <td>Inner</td>
+      <td id="si_L"><img src="assets/triangle.svg" class="glyphInnerSelected"></td>
+      <td id="si_M"><img src="assets/circle.svg" class="glyphInnerSelected"></td>
+      <td id="si_R"><img src="assets/square.svg" class="glyphInnerSelected"></td>
+    </tr>
+    <tr id="selected">
+      <td>Outer</td>
+      <td id="so_L"><img src="assets/null.svg" class="glyphOuterSelected"></td>
+      <td id="so_M"><img src="assets/null.svg" class="glyphOuterSelected"></td>
+      <td id="so_R"><img src="assets/null.svg" class="glyphOuterSelected"></td>
+    </tr>
+    <tr>
+      <td>Pick</td>
+      <td><!--
+        --><img onclick="selectInner('L', 'T')" src="assets/triangle.svg" class="glyphInnerSelect"><!--
+        --><img onclick="selectInner('L', 'C')" src="assets/circle.svg" class="glyphInnerSelect"><!--
+        --><img onclick="selectInner('L', 'S')" src="assets/square.svg" class="glyphInnerSelect"><!--
+        --></td>
+      <td><!--
+        --><img onclick="selectInner('M', 'T')" src="assets/triangle.svg" class="glyphInnerSelect"><!--
+        --><img onclick="selectInner('M', 'C')" src="assets/circle.svg" class="glyphInnerSelect"><!--
+        --><img onclick="selectInner('M', 'S')" src="assets/square.svg" class="glyphInnerSelect"><!--
+        --></td>
+      <td><!--
+        --><img onclick="selectInner('R', 'T')" src="assets/triangle.svg" class="glyphInnerSelect"><!--
+        --><img onclick="selectInner('R', 'C')" src="assets/circle.svg" class="glyphInnerSelect"><!--
+        --><img onclick="selectInner('R', 'S')" src="assets/square.svg" class="glyphInnerSelect"><!--
+        --></td>
+    </tr>
+    <tr>
+      <td>Pick</td>
+      <td><!--
+        --><img onclick="selectOuter('L', 'TT')" src="assets/tetrahedron.svg" class="glyphOuterSelect" /><!--
+        --><img onclick="selectOuter('L', 'CC')" src="assets/sphere.svg" class="glyphOuterSelect" /><!--
+        --><img onclick="selectOuter('L', 'SS')" src="assets/cube.svg" class="glyphOuterSelect" /><!--
+        --><br><!--
+        --><img onclick="selectOuter('L', 'TC')" src="assets/cone.svg" class="glyphOuterSelect" /><!--
+        --><img onclick="selectOuter('L', 'CS')" src="assets/cylinder.svg" class="glyphOuterSelect" /><!--
+        --><img onclick="selectOuter('L', 'TS')" src="assets/prism.svg" class="glyphOuterSelect" /><!--
+      --></td>
+      <td><!--
+      --><img onclick="selectOuter('M', 'TT')" src="assets/tetrahedron.svg" class="glyphOuterSelect" /><!--
+      --><img onclick="selectOuter('M', 'CC')" src="assets/sphere.svg" class="glyphOuterSelect" /><!--
+      --><img onclick="selectOuter('M', 'SS')" src="assets/cube.svg" class="glyphOuterSelect" /><!--
+      --><br><!--
+      --><img onclick="selectOuter('M', 'TC')" src="assets/cone.svg" class="glyphOuterSelect" /><!--
+      --><img onclick="selectOuter('M', 'CS')" src="assets/cylinder.svg" class="glyphOuterSelect" /><!--
+      --><img onclick="selectOuter('M', 'TS')" src="assets/prism.svg" class="glyphOuterSelect" /><!--
+    --></td>
+      <td><!--
+      --><img onclick="selectOuter('R', 'TT')" src="assets/tetrahedron.svg" class="glyphOuterSelect" /><!--
+      --><img onclick="selectOuter('R', 'CC')" src="assets/sphere.svg" class="glyphOuterSelect" /><!--
+      --><img onclick="selectOuter('R', 'SS')" src="assets/cube.svg" class="glyphOuterSelect" /><!--
+      --><br><!--
+      --><img onclick="selectOuter('R', 'TC')" src="assets/cone.svg" class="glyphOuterSelect" /><!--
+      --><img onclick="selectOuter('R', 'CS')" src="assets/cylinder.svg" class="glyphOuterSelect" /><!--
+      --><img onclick="selectOuter('R', 'TS')" src="assets/prism.svg" class="glyphOuterSelect" /><!--
+    --></td>
+    </tr>
+  </table>
+  <div id="solution_output"></div>
+</body>
+
+</html>

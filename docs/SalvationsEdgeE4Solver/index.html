@@ -3,6 +3,7 @@
 <head>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script>
+    // The solver algorithm:
     const DISSECT_L = 0b010000;
     const DISSECT_M = 0b000100;
     const DISSECT_R = 0b000001;
@@ -13,7 +14,6 @@
       0b000001: "R",
       0b000001: "N",
     };
-
     function makeDissectOps() {
       var ops = [];
       var pairs = [
@@ -35,7 +35,65 @@
       return ops;
     };
     const DISSECT_OPS = makeDissectOps();
+    function dissect(shape, dec, inc) {
+      return ((shape & (dec * 3)) > 0 ? shape - dec + inc : 0);
+    }
+    function applyOp(state, op) {
+      var elems = new Uint16Array(3);
+      elems[0] = (op[0] > 0 ? dissect(state[0], op[0], op[1] | op[2]) : state[0]);
+      elems[1] = (op[1] > 0 ? dissect(state[1], op[1], op[0] | op[2]) : state[1]);
+      elems[2] = (op[2] > 0 ? dissect(state[2], op[2], op[0] | op[1]) : state[2]);
+      if (elems[0] == 0 || elems[1] == 0 || elems[2] == 0) {
+        return null;
+      }
+      return elems;
+    }
+    function stateToId(state) {
+      return (state != null ? ((state[2] << 12) | (state[1] << 6) | state[0]) : 0);
+    }
+    function stateEq(a, b) { return stateToId(a) == stateToId(b); }
+    function bfsSolve(startState, finalState) {
+      var queue = [{ state: startState, prev: null }];
+      var known = new Set();
+      known.add(stateToId(startState));
+      for (let i = 0; i < queue.length && i < (1 << 18); i++) {
+        let curr = queue[i];
+        if (stateEq(curr.state, finalState)) {
+          return curr;
+        }
+        for (let j = 0; j < DISSECT_OPS.length; j++) {
+          let res = applyOp(curr.state, DISSECT_OPS[j]);
+          let sid = stateToId(res);
+          if (res != null && !known.has(sid)) {
+            queue.push({ state: res, prev: curr, op: DISSECT_OPS[j] });
+            known.add(sid);
+          }
+        }
+      }
+      return null;
+    }
 
+    // Conversion between UI and solver
+    function toAbstractState(inner, outer) {
+      function toAbstractShape(shapeStr) {
+        if (shapeStr == null || shapeStr.length != 2) {
+          return 0;
+        }
+        var shapes = shapeStr.split('');
+        var lookup = {};
+        lookup[inner.L] = DISSECT_L;
+        lookup[inner.M] = DISSECT_M;
+        lookup[inner.R] = DISSECT_R;
+        return lookup[shapes[0]] + lookup[shapes[1]];
+      }
+      return new Uint8Array([
+        toAbstractShape(outer.L),
+        toAbstractShape(outer.M),
+        toAbstractShape(outer.R),
+      ]);
+    }
+
+    // The UI part
     var svgShapes = {
       N: '<img src="assets/null.svg" class="glyphInnerSelected">',
       T: '<img src="assets/triangle.svg" class="glyphInnerSelected">',
@@ -56,30 +114,14 @@
       inner: { L: "T", M: "C", R: "S" },
       outer: { L: null, M: null, R: null },
     };
-    function selectInner(side, name) {
-      var oname = uiState.inner[side];
-      var oside = (uiState.inner.L == name ? "L" : (uiState.inner.M == name ? "M" : "R"));
-      $("#si_" + oside).html(svgShapes[oname]);
-      $("#si_" + side).html(svgShapes[name]);
-      uiState.inner[side] = name;
-      uiState.inner[oside] = oname;
-
-      uiState.outer = { L: null, M: null, R: null };
-      $("#so_L").html(svgShapes.NN);
-      $("#so_M").html(svgShapes.NN);
-      $("#so_R").html(svgShapes.NN);
-      $("#solution_output").html("<div></div>");
+    function shape3dToStringSubs(shape, L, M, R) {
+      return L.repeat((shape >> 4) & 3) + M.repeat((shape >> 2) & 3) + R.repeat(shape & 3)
     }
-    function toAbstractShape(shapeStr) {
-      if (shapeStr == null || shapeStr.length != 2) {
-        return 0;
-      }
-      var shapes = shapeStr.split('');
-      var lookup = {};
-      lookup[uiState.inner.L] = DISSECT_L;
-      lookup[uiState.inner.M] = DISSECT_M;
-      lookup[uiState.inner.R] = DISSECT_R;
-      return lookup[shapes[0]] + lookup[shapes[1]];
+    function shape3dToString(shape) {
+      return "L".repeat((shape >> 4) & 3) + "M".repeat((shape >> 2) & 3) + "R".repeat(shape & 3)
+    }
+    function stateToString(state) {
+      return shape3dToString(state[0]) + " " + shape3dToString(state[1]) + " " + shape3dToString(state[2]);
     }
     function stateToShapes(state) {
       var lShape = svgShapes[shape3dToStringSubs(state[0], uiState.inner.L, uiState.inner.M, uiState.inner.R)];
@@ -95,18 +137,10 @@
       lookup[DISSECT_N] = svgShapes.N;
       return lookup[op[0]] + lookup[op[1]] + lookup[op[2]];
     }
-    function updateState() {
-      var finalState = new Uint8Array([
-        DISSECT_M | DISSECT_R,
-        DISSECT_L | DISSECT_R,
-        DISSECT_L | DISSECT_M,
-      ]);
-      var startState = new Uint8Array([
-        toAbstractShape(uiState.outer.L),
-        toAbstractShape(uiState.outer.M),
-        toAbstractShape(uiState.outer.R),
-      ]);
-      var resolved = bfsSolve(startState, finalState, DISSECT_OPS);
+    function attemptSolve(inner, outer) {
+      var finalState = new Uint8Array([DISSECT_M | DISSECT_R, DISSECT_L | DISSECT_R, DISSECT_L | DISSECT_M]);
+      var startState = toAbstractState(inner, outer);
+      var resolved = bfsSolve(startState, finalState);
       if (resolved == null) {
         $("#solution_output").html("<div></div>");
         return;
@@ -122,67 +156,24 @@
       stack.reverse();
       $("#solution_output").html(stack.join("<br>"));
     }
+    function selectInner(side, name) {
+      var oname = uiState.inner[side];
+      var oside = (uiState.inner.L == name ? "L" : (uiState.inner.M == name ? "M" : "R"));
+      $("#si_" + oside).html(svgShapes[oname]);
+      $("#si_" + side).html(svgShapes[name]);
+      uiState.inner[side] = name;
+      uiState.inner[oside] = oname;
+
+      uiState.outer = { L: null, M: null, R: null };
+      $("#so_L").html(svgShapes.NN);
+      $("#so_M").html(svgShapes.NN);
+      $("#so_R").html(svgShapes.NN);
+      $("#solution_output").html("<div></div>");
+    }
     function selectOuter(side, name) {
       $("#so_" + side).html(svgShapes[name]);
       uiState.outer[side] = name;
-      updateState();
-    }
-    function shape3dToStringSubs(shape, L, M, R) {
-      return L.repeat((shape >> 4) & 3) + M.repeat((shape >> 2) & 3) + R.repeat(shape & 3)
-    }
-    function shape3dToString(shape) {
-      return "L".repeat((shape >> 4) & 3) + "M".repeat((shape >> 2) & 3) + "R".repeat(shape & 3)
-    }
-    function stateToString(state) {
-      return shape3dToString(state[0]) + " " + shape3dToString(state[1]) + " " + shape3dToString(state[2]);
-    }
-    function makeShape12bit(shape6) {
-      return (((shape6 >> 4) & 3) << 8) | (((shape6 >> 2) & 3) << 4) | (shape6 & 3);
-    }
-    function makeShape6bit(shape12) {
-      return (((shape12 >> 8) & 3) << 4) | (((shape12 >> 4) & 3) << 2) | (shape12 & 3);
-    }
-    function dissect(shape, dec, inc) {
-      if ((shape & (dec * 3)) > 0) {
-        return shape - dec + inc;
-      }
-      return 0;
-    }
-    function applyOp(state, op) {
-      var elems = new Uint16Array(3);
-      elems[0] = (op[0] > 0 ? dissect(state[0], op[0], op[1] | op[2]) : state[0]);
-      elems[1] = (op[1] > 0 ? dissect(state[1], op[1], op[0] | op[2]) : state[1]);
-      elems[2] = (op[2] > 0 ? dissect(state[2], op[2], op[0] | op[1]) : state[2]);
-      if (elems[0] == 0 || elems[1] == 0 || elems[2] == 0) {
-        return null;
-      }
-      return elems;
-    }
-
-    function stateToId(state) {
-      return (state != null ? ((state[2] << 12) | (state[1] << 6) | state[0]) : 0);
-    }
-    function stateEq(a, b) { return stateToId(a) == stateToId(b); }
-
-    function bfsSolve(state, finalState, ops) {
-      var queue = [{ state: state, prev: null }];
-      var known = new Set();
-      known.add(stateToId(state));
-      for (let i = 0; i < queue.length && i < (1 << 18); i++) {
-        let curr = queue[i];
-        if (stateEq(curr.state, finalState)) {
-          return curr;
-        }
-        for (let j = 0; j < ops.length; j++) {
-          let res = applyOp(curr.state, ops[j]);
-          let sid = stateToId(res);
-          if (res != null && !known.has(sid)) {
-            queue.push({ state: res, prev: curr, op: ops[j] });
-            known.add(sid);
-          }
-        }
-      }
-      return null;
+      attemptSolve(uiState.inner, uiState.outer);
     }
   </script>
   <style>
@@ -205,7 +196,8 @@
 </head>
 
 <body>
-  <div>Work in Progress:<br>Destiny 2: Salvation's Edge E4 Solver (<a href="https://github.com/hysw/Destiny2/tree/main/docs/SalvationsEdgeE4Solver">source</a>)</div>
+  <div>Work in Progress:<br>Destiny 2: Salvation's Edge E4 Solver (<a
+      href="https://github.com/hysw/Destiny2/tree/main/docs/SalvationsEdgeE4Solver">source</a>)</div>
   <table>
     <tr id="selected">
       <td>Inner</td>

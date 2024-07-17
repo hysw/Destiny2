@@ -160,7 +160,8 @@
       return "<td>" + lookup[op[0]] + "</td><td>" + lookup[op[1]] + "</td><td>" + lookup[op[2]] + "</td>";
     }
     function attemptSolve(inner, outer) {
-      var finalState = new Uint8Array([DISSECT_M | DISSECT_R, DISSECT_L | DISSECT_R, DISSECT_L | DISSECT_M]);
+      // var finalState = new Uint8Array([DISSECT_M | DISSECT_R, DISSECT_L | DISSECT_R, DISSECT_L | DISSECT_M]);
+      var finalState = new Uint8Array([DISSECT_R + DISSECT_R, DISSECT_L + DISSECT_L, DISSECT_M + DISSECT_M]);
       var startState = toAbstractState(inner, outer);
       var resolved = bfsSolve(startState, finalState);
       if (resolved == null) {
@@ -265,12 +266,12 @@
         --><img onclick="selectInner('R', 'S')" src="assets/square.svg" class="glyphInnerSelect"><!--
         --></td>
     </tr>
-    <tr>
+    <!--tr style="height:0px">
       <td>Outer<br>Want</td>
       <td id="want_L"><img src="assets/null.svg" class="glyphOuterSelected"></td>
       <td id="want_M"><img src="assets/null.svg" class="glyphOuterSelected"></td>
       <td id="want_R"><img src="assets/null.svg" class="glyphOuterSelected"></td>
-    </tr>
+    </tr-->
     <tr id="selected_out">
       <td>Outer<br>Got</td>
       <td id="so_L"><img src="assets/null.svg" class="glyphOuterSelected"></td>

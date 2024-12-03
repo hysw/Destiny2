@@ -1,4 +1,8 @@
 <html>
   <head></head>
-  <body>...</body>
+  <body><div id="code_div">...</div><script>
+    let params = new URLSearchParams(document.location.search);
+    let code = params.get("code");
+    document.getElementById("code_div").innerHTML = "AUTH_CODE = \"" + code + "\"";
+  </script></body>
 </html>

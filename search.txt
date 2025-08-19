@@ -1,1 +1,0 @@
--#keep ( tag:none OR tag:archive ) -is:exotic -is:maxpower

@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Run update script
-      run: bash update-wishlist.sh
+      run: python3 src/wishlist/update.py
     - name: Update git stuff
       run: |
         git config --local user.name  ${{ github.actor }}
